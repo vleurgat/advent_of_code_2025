@@ -3,7 +3,7 @@ class Solution:
 
     def __init__(self):
         self.banks = []
-        self.batteries
+        self.batteries = 0
 
 
     def read_file(self, filename: str):

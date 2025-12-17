@@ -162,7 +162,7 @@ class Solution1:
         return False, attempted_str
 
 
-    def fit(self, region, presents) -> bool:
+    def fit0(self, region, presents) -> bool:
         grid = []
         for _ in range(region[1]):
             grid.append('.' * region[0])
@@ -180,6 +180,45 @@ class Solution1:
         return self.do_fit(0, grid, present_shape_ids, "")
 
 
+    def fit(self, region, presents) -> bool:
+        present_shape_ids = []
+        for pi in range(len(presents)):
+            if presents[pi] > 0:
+                print(f"adding {presents[pi]} shapes of index {pi}")
+                for _ in range(presents[pi]):
+                    present_shape_ids.append(pi)
+
+        if self.is_definitely_possible(region, present_shape_ids):
+            return True
+        if self.is_definitely_impossible(region, present_shape_ids):
+            return False
+        raise Exception(f"got unknown for region {region} and presents {presents}")
+
+
+    def is_definitely_possible(self, region, present_shape_ids) -> bool:
+        presents_area = len(present_shape_ids) * 9
+        grid_area = region[0] * region[1]
+        return presents_area <= grid_area
+
+
+    def area_of_shape(self, shape_id):
+        shape_area = 0
+        shape = self.shapes[shape_id][0]
+        for y in range(len(shape)):
+            for x in range(len(shape[y])):
+                if shape[y][x] == '#':
+                    shape_area += 1
+        return shape_area
+
+
+    def is_definitely_impossible(self, region, present_shape_ids) -> bool:
+        grid_area = region[0] * region[1]
+        present_area = 0
+        for present_shape_id in present_shape_ids:
+            present_area += self.area_of_shape(present_shape_id)
+        return present_area > grid_area
+
+
     def solve(self, filename):
         self.read_file(filename)
         # print("shapes are:")
@@ -191,11 +230,15 @@ class Solution1:
         # print(f"regions are: {self.regions}")
         # print(f"presents are: {self.presents}")
 
-        i = 1
-        ret = self.fit(self.regions[i], self.presents[i])
-        print(f"result for {i} is {ret}")
+        total = 0
+        for i in range(len(self.regions)):
+            ret = self.fit(self.regions[i], self.presents[i])
+            print(f"result for {i} is {ret}")
+            if ret:
+                total += 1
+        print(f"total is {total}")
 
 
 if __name__ == "__main__":
     solution = Solution1()
-    solution.solve('test.txt')
+    solution.solve('input.txt')
